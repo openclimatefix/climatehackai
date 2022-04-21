@@ -5,10 +5,10 @@ from pytorch_lightning import LightningModule
 from torchmetrics import MaxMetric
 from torchmetrics.classification.accuracy import Accuracy
 
-from src.models.components.simple_dense_net import SimpleDenseNet
+from src.models.components.xresnet_unet import XResUNet
 
 
-class MNISTLitModule(LightningModule):
+class XResUNetLitModule(LightningModule):
     """Example of LightningModule for MNIST classification.
 
     A LightningModule organizes your PyTorch code into 5 sections:

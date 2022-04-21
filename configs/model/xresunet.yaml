@@ -1,0 +1,10 @@
+_target_: src.models.mnist_module.MNISTLitModule
+lr: 0.001
+weight_decay: 0.0005
+
+net:
+  _target_: src.models.components.xresnet_unet.XResUNet
+  input_size: (128,128)
+  forecast_steps: 24
+  history_steps: 12
+  pretrained: False
