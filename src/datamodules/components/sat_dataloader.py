@@ -114,7 +114,9 @@ class Satellite(DataLoader):
         std = np.expand_dims(std, axis=[1, 2, 3])
         hrvsatellite = hrvsatellite - mean
         hrvsatellite = hrvsatellite / std
+        input_data = hrvsatellite.values[:,:7]
+        target_data = hrvsatellite.values[:,7:]
         merged_data = (
-            np.concatenate((hrvsatellite.values, dataset["y_osgb"].values,dataset["x_osgb"].values), 0)
-        )
-        return merged_data
+            np.concatenate((input_data, np.expand_dims(dataset["y_osgb"].values, axis=[1,2]),np.expand_dims(dataset["x_osgb"].values, axis=[1,2])), 1)
+        ) # Now in Batch, Time+Coord, Channel, W, H orderk
+        return merged_data, target_data
