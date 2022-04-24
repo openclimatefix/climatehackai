@@ -35,6 +35,7 @@ class SatDataModule(LightningDataModule):
 
         # this line allows to access init params with 'self.hparams' attribute
         self.save_hyperparameters(logger=False)
+        self.channels = channels
 
         self.data_train: Optional[Dataset] = None
         self.data_val: Optional[Dataset] = None
@@ -50,9 +51,9 @@ class SatDataModule(LightningDataModule):
 
         # load datasets only if they're not loaded already
         if not self.data_train and not self.data_val and not self.data_test:
-            self.data_train = Satellite(channels=, data_dir=self.hparams.data_dir + "/train/")
-            self.data_val = Satellite(channels=, data_dir=self.hparams.data_dir + "/test/")
-            self.data_test = Satellite(channels=, data_dir=self.hparams.data_dir + "/test/")
+            self.data_train = Satellite(channels=self.channels, data_dir=self.hparams.data_dir + "/train/")
+            self.data_val = Satellite(channels=self.channels, data_dir=self.hparams.data_dir + "/test/")
+            self.data_test = Satellite(channels=self.channels, data_dir=self.hparams.data_dir + "/test/")
 
     def train_dataloader(self):
         return DataLoader(

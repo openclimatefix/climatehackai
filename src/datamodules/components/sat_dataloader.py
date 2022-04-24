@@ -4,7 +4,7 @@ import fsspec
 import glob
 import os
 
-from torch.utils.data import Dataloader
+from torch.utils.data import ConcatDataset, DataLoader, Dataset, random_split
 
 SAT_MEAN = {
     "HRV": 236.13257536395903,
@@ -53,7 +53,7 @@ def load_netcdf(filename, engine="h5netcdf", *args, **kwargs) -> xr.Dataset:
     return dataset
 
 
-class Satellite(Dataloader):
+class Satellite(DataLoader):
     def __init__(self, channels=["IR_016", "IR_039", "IR_087", "IR_097", "IR_108", "IR_120", "IR_134", "VIS006", "VIS008", "WV_062", "WV_073"], data_dir="./"):
         self.channels = channels
         self.data_dir = data_dir

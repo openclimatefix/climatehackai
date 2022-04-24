@@ -13,6 +13,7 @@ from torch import nn
 
 class XResUNet(nn.Module):
     def __init__(self, input_size, forecast_steps, history_steps, pretrained=False):
+        super().__init__()
         arch = partial(xse_resnext50_deeper, act_cls=Mish, sa=True)
         self.model = create_unet_model(
             arch=arch,
