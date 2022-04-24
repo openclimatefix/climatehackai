@@ -3,7 +3,7 @@
 # specify here default training configuration
 defaults:
   - _self_
-  - datamodule: mnist.yaml
+  - datamodule: xresunet.yaml
   - model: xresunet.yaml
   - callbacks: default.yaml
   - logger: null # set logger here or use command line (e.g. `python train.py logger=tensorboard`)
@@ -34,7 +34,7 @@ defaults:
 original_work_dir: ${hydra:runtime.cwd}
 
 # path to folder with data
-data_dir: ${original_work_dir}/data/
+data_dir: "/mnt/storage_ssd_4tb/data/ocf/solar_pv_nowcasting/nowcasting_dataset_pipeline/prepared_ML_training_data/v15/"
 
 # pretty print config at the start of the run using Rich library
 print_config: True

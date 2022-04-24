@@ -3,11 +3,10 @@ from typing import Optional, Tuple
 import torch
 from pytorch_lightning import LightningDataModule
 from torch.utils.data import ConcatDataset, DataLoader, Dataset, random_split
-from torchvision.datasets import MNIST
-from torchvision.transforms import transforms
+from src.datamodules.components.sat_dataloader import Satellite
 
 
-class MNISTDataModule(LightningDataModule):
+class SatDataModule(LightningDataModule):
     """Example of LightningDataModule for MNIST dataset.
 
     A DataModule implements 5 key methods:
@@ -27,8 +26,8 @@ class MNISTDataModule(LightningDataModule):
     def __init__(
         self,
         data_dir: str = "data/",
-        train_val_test_split: Tuple[int, int, int] = (55_000, 5_000, 10_000),
         batch_size: int = 64,
+        channels: list = ["IR_016", "IR_039", "IR_087", "IR_097", "IR_108", "IR_120", "IR_134", "VIS006", "VIS008", "WV_062", "WV_073"],
         num_workers: int = 0,
         pin_memory: bool = False,
     ):
@@ -37,27 +36,9 @@ class MNISTDataModule(LightningDataModule):
         # this line allows to access init params with 'self.hparams' attribute
         self.save_hyperparameters(logger=False)
 
-        # data transformations
-        self.transforms = transforms.Compose(
-            [transforms.ToTensor(), transforms.Normalize((0.1307,), (0.3081,))]
-        )
-
         self.data_train: Optional[Dataset] = None
         self.data_val: Optional[Dataset] = None
         self.data_test: Optional[Dataset] = None
-
-    @property
-    def num_classes(self) -> int:
-        return 10
-
-    def prepare_data(self):
-        """Download data if needed.
-
-        This method is called only from a single GPU.
-        Do not use it to assign state (self.x = y).
-        """
-        MNIST(self.hparams.data_dir, train=True, download=True)
-        MNIST(self.hparams.data_dir, train=False, download=True)
 
     def setup(self, stage: Optional[str] = None):
         """Load data. Set variables: `self.data_train`, `self.data_val`, `self.data_test`.
@@ -69,19 +50,14 @@ class MNISTDataModule(LightningDataModule):
 
         # load datasets only if they're not loaded already
         if not self.data_train and not self.data_val and not self.data_test:
-            trainset = MNIST(self.hparams.data_dir, train=True, transform=self.transforms)
-            testset = MNIST(self.hparams.data_dir, train=False, transform=self.transforms)
-            dataset = ConcatDataset(datasets=[trainset, testset])
-            self.data_train, self.data_val, self.data_test = random_split(
-                dataset=dataset,
-                lengths=self.hparams.train_val_test_split,
-                generator=torch.Generator().manual_seed(42),
-            )
+            self.data_train = Satellite(channels=, data_dir=self.hparams.data_dir + "/train/")
+            self.data_val = Satellite(channels=, data_dir=self.hparams.data_dir + "/test/")
+            self.data_test = Satellite(channels=, data_dir=self.hparams.data_dir + "/test/")
 
     def train_dataloader(self):
         return DataLoader(
             dataset=self.data_train,
-            batch_size=self.hparams.batch_size,
+            batch_size=None,
             num_workers=self.hparams.num_workers,
             pin_memory=self.hparams.pin_memory,
             shuffle=True,
@@ -90,7 +66,7 @@ class MNISTDataModule(LightningDataModule):
     def val_dataloader(self):
         return DataLoader(
             dataset=self.data_val,
-            batch_size=self.hparams.batch_size,
+            batch_size=None,
             num_workers=self.hparams.num_workers,
             pin_memory=self.hparams.pin_memory,
             shuffle=False,
@@ -99,7 +75,7 @@ class MNISTDataModule(LightningDataModule):
     def test_dataloader(self):
         return DataLoader(
             dataset=self.data_test,
-            batch_size=self.hparams.batch_size,
+            batch_size=None,
             num_workers=self.hparams.num_workers,
             pin_memory=self.hparams.pin_memory,
             shuffle=False,
