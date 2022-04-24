@@ -3,7 +3,6 @@ from fastai.callback.wandb import *
 from fastai.callback.tracker import *
 from fastai.distributed import *
 from fastai.vision.models.xresnet import *
-from fastai.optimizer import ranger
 from fastai.layers import Mish
 
 

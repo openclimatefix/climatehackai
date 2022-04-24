@@ -4,6 +4,7 @@ import torch
 from pytorch_lightning import LightningModule
 from torchmetrics import MaxMetric
 from torchmetrics.classification.accuracy import Accuracy
+from src.models.components.ranger import Ranger
 
 from src.models.components.xresnet_unet import XResUNet
 
@@ -32,9 +33,11 @@ class XResUNetLitModule(LightningModule):
 
         # this line allows to access init params with 'self.hparams' attribute
         # it also ensures init params will be stored in ckpt
-        self.save_hyperparameters(logger=False)
+        #self.save_hyperparameters(logger=False)
 
         self.net = net
+        self.lr = lr
+        self.weight_decay = weight_decay
 
         # loss function
         self.criterion = torch.nn.CrossEntropyLoss()
@@ -116,6 +119,4 @@ class XResUNetLitModule(LightningModule):
         See examples here:
             https://pytorch-lightning.readthedocs.io/en/latest/common/lightning_module.html#configure-optimizers
         """
-        return torch.optim.Adam(
-            params=self.parameters(), lr=self.hparams.lr, weight_decay=self.hparams.weight_decay
-        )
+        return Ranger(self.net.parameters(), self.lr)
