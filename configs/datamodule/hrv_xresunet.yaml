@@ -2,6 +2,6 @@ _target_: src.datamodules.xresunet_datamodule.SatDataModule
 
 data_dir: ${data_dir} # data_dir is specified in config.yaml
 batch_size: 32
-num_workers: 8
+num_workers: 32
 channels: ["HRV"]
 pin_memory: True

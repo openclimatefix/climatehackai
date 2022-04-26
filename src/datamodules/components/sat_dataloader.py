@@ -119,4 +119,4 @@ class Satellite(DataLoader):
         merged_data = (
             np.concatenate((input_data, np.expand_dims(dataset["y_osgb"].values, axis=[1,2]),np.expand_dims(dataset["x_osgb"].values, axis=[1,2])), 1)
         ) # Now in Batch, Time+Coord, Channel, W, H orderk
-        return merged_data, target_data
+        return np.squeeze(merged_data), np.squeeze(target_data)
