@@ -2,9 +2,8 @@ from typing import Any, List
 
 import torch
 from torch.optim.lr_scheduler import CosineAnnealingLR
+from torch.optim import AdamW
 from pytorch_lightning import LightningModule
-from torchmetrics import MaxMetric
-from torchmetrics.classification.accuracy import Accuracy
 from src.models.components.ranger import Ranger
 
 from src.models.components.xresnet_unet import XResUNet
@@ -48,8 +47,11 @@ class XResUNetLitModule(LightningModule):
 
     def step(self, batch: Any):
         x, y = batch
+        x = x.float()
+        y = y.float()
         logits = self.forward(x)
-        loss = self.criterion(logits, y)
+        # Center crop here
+        loss = self.criterion(logits[:, :, 16:48, 16:48], y[:, :, 16:48, 16:48])
         return loss
 
     def training_step(self, batch: Any, batch_idx: int):
@@ -76,9 +78,7 @@ class XResUNetLitModule(LightningModule):
         return {"loss": loss}
 
     def validation_epoch_end(self, outputs: List[Any]):
-        acc = self.val_acc.compute()  # get val accuracy from current epoch
-        self.val_acc_best.update(acc)
-        self.log("val/acc_best", self.val_acc_best.compute(), on_epoch=True, prog_bar=True)
+        pass
 
     def test_step(self, batch: Any, batch_idx: int):
         loss = self.step(batch)
@@ -98,14 +98,4 @@ class XResUNetLitModule(LightningModule):
         See examples here:
             https://pytorch-lightning.readthedocs.io/en/latest/common/lightning_module.html#configure-optimizers
         """
-        optimizer = Ranger(self.parameters(), lr = self.lr)
-
-        scheduler = CosineAnnealingLR(optimizer,
-                                      T_max=100,
-                                      eta_min=1e-5,
-                                      last_epoch=-1)
-
-        return dict(
-            optimizer=optimizer,
-            lr_scheduler=scheduler
-        )
+        return AdamW(self.net.parameters(), lr=self.lr)
