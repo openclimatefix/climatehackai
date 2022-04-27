@@ -4,7 +4,6 @@ import torch
 from torch.optim.lr_scheduler import CosineAnnealingLR
 from torch.optim import AdamW
 from pytorch_lightning import LightningModule
-from src.models.components.ranger import Ranger
 
 from src.models.components.xresnet_unet import XResUNet
 
