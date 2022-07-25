@@ -1,12 +1,9 @@
-from fastai.vision.all import *
-from fastai.callback.wandb import *
 from fastai.callback.tracker import *
+from fastai.callback.wandb import *
 from fastai.distributed import *
-from fastai.vision.models.xresnet import *
 from fastai.layers import Mish
-
-
-
+from fastai.vision.all import *
+from fastai.vision.models.xresnet import *
 from torch import nn
 
 

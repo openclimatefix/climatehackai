@@ -3,6 +3,7 @@ from typing import Optional, Tuple
 import torch
 from pytorch_lightning import LightningDataModule
 from torch.utils.data import ConcatDataset, DataLoader, Dataset, random_split
+
 from src.datamodules.components.sat_dataloader import Satellite
 
 
@@ -27,7 +28,19 @@ class SatDataModule(LightningDataModule):
         self,
         data_dir: str = "data/",
         batch_size: int = 64,
-        channels: list = ["IR_016", "IR_039", "IR_087", "IR_097", "IR_108", "IR_120", "IR_134", "VIS006", "VIS008", "WV_062", "WV_073"],
+        channels: list = [
+            "IR_016",
+            "IR_039",
+            "IR_087",
+            "IR_097",
+            "IR_108",
+            "IR_120",
+            "IR_134",
+            "VIS006",
+            "VIS008",
+            "WV_062",
+            "WV_073",
+        ],
         num_workers: int = 0,
         pin_memory: bool = False,
     ):
@@ -51,9 +64,15 @@ class SatDataModule(LightningDataModule):
 
         # load datasets only if they're not loaded already
         if not self.data_train and not self.data_val and not self.data_test:
-            self.data_train = Satellite(channels=self.channels, data_dir=self.hparams.data_dir + "/train/")
-            self.data_val = Satellite(channels=self.channels, data_dir=self.hparams.data_dir + "/test/")
-            self.data_test = Satellite(channels=self.channels, data_dir=self.hparams.data_dir + "/test/")
+            self.data_train = Satellite(
+                channels=self.channels, data_dir=self.hparams.data_dir + "/train/"
+            )
+            self.data_val = Satellite(
+                channels=self.channels, data_dir=self.hparams.data_dir + "/test/"
+            )
+            self.data_test = Satellite(
+                channels=self.channels, data_dir=self.hparams.data_dir + "/test/"
+            )
 
     def train_dataloader(self):
         return DataLoader(

@@ -1,9 +1,9 @@
-import numpy as np
-import xarray as xr
-import fsspec
 import glob
 import os
 
+import fsspec
+import numpy as np
+import xarray as xr
 from torch.utils.data import ConcatDataset, DataLoader, Dataset, random_split
 
 SAT_MEAN = {
@@ -41,10 +41,11 @@ SATELLITE_CHANNEL_ORDER = ("example", "time", "channel", "y", "x")
 
 
 def _set_sat_coords(dataset: xr.Dataset) -> xr.Dataset:
-    """Set variables as coordinates"""
+    """Set variables as coordinates."""
     return dataset.set_coords(
         ["time_utc", "channel_name", "y_osgb", "x_osgb", "y_geostationary", "x_geostationary"]
     )
+
 
 def load_netcdf(filename, engine="h5netcdf", *args, **kwargs) -> xr.Dataset:
     """Load a NetCDF dataset from local file system or cloud bucket."""
@@ -54,7 +55,23 @@ def load_netcdf(filename, engine="h5netcdf", *args, **kwargs) -> xr.Dataset:
 
 
 class Satellite(DataLoader):
-    def __init__(self, channels=["IR_016", "IR_039", "IR_087", "IR_097", "IR_108", "IR_120", "IR_134", "VIS006", "VIS008", "WV_062", "WV_073"], data_dir="./"):
+    def __init__(
+        self,
+        channels=[
+            "IR_016",
+            "IR_039",
+            "IR_087",
+            "IR_097",
+            "IR_108",
+            "IR_120",
+            "IR_134",
+            "VIS006",
+            "VIS008",
+            "WV_062",
+            "WV_073",
+        ],
+        data_dir="./",
+    ):
         self.channels = channels
         self.data_dir = data_dir
         if "HRV" in self.channels:
@@ -114,9 +131,14 @@ class Satellite(DataLoader):
         std = np.expand_dims(std, axis=[1, 2, 3])
         hrvsatellite = hrvsatellite - mean
         hrvsatellite = hrvsatellite / std
-        input_data = hrvsatellite.values[:,:7]
-        target_data = hrvsatellite.values[:,7:]
-        merged_data = (
-            np.concatenate((input_data, np.expand_dims(dataset["y_osgb"].values, axis=[1,2]),np.expand_dims(dataset["x_osgb"].values, axis=[1,2])), 1)
-        ) # Now in Batch, Time+Coord, Channel, W, H orderk
+        input_data = hrvsatellite.values[:, :7]
+        target_data = hrvsatellite.values[:, 7:]
+        merged_data = np.concatenate(
+            (
+                input_data,
+                np.expand_dims(dataset["y_osgb"].values, axis=[1, 2]),
+                np.expand_dims(dataset["x_osgb"].values, axis=[1, 2]),
+            ),
+            1,
+        )  # Now in Batch, Time+Coord, Channel, W, H orderk
         return np.squeeze(merged_data), np.squeeze(target_data)
