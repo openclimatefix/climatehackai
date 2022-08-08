@@ -1,9 +1,9 @@
 from typing import Any, List
 
 import torch
-from torch.optim.lr_scheduler import CosineAnnealingLR
-from torch.optim import AdamW
 from pytorch_lightning import LightningModule
+from torch.optim import AdamW
+from torch.optim.lr_scheduler import CosineAnnealingLR
 
 from src.models.components.xresnet_unet import XResUNet
 
@@ -32,7 +32,7 @@ class XResUNetLitModule(LightningModule):
 
         # this line allows to access init params with 'self.hparams' attribute
         # it also ensures init params will be stored in ckpt
-        #self.save_hyperparameters(logger=False)
+        # self.save_hyperparameters(logger=False)
 
         self.net = net
         self.lr = lr
@@ -85,7 +85,9 @@ class XResUNetLitModule(LightningModule):
         # log test metrics
         self.log("test/loss", loss, on_step=False, on_epoch=True)
 
-        return {"loss": loss, }
+        return {
+            "loss": loss,
+        }
 
     def test_epoch_end(self, outputs: List[Any]):
         pass
